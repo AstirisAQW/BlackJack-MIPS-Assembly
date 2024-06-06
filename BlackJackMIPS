@@ -1,0 +1,331 @@
+.data
+.align 2
+	array_dealerCards:	.space 40	# Space to store dealer's cards
+	array_playerCards:	.space 40	# Space to store player's cards
+	
+	text_BlackJack: 	.asciiz "\n**** BlackJack in MIPS ****"
+	text_choices:		.asciiz "\nPress Hit(1) or Stay(2): "
+	
+	text_dealerCards:	.asciiz "\nDealer's Cards: "
+	text_dealerCardsScore:	.asciiz "\nDealer's Score: "
+	text_dealerWins:	.asciiz "\n**** Dealer has won!!! ****\n"
+	
+	text_playerCards:	.asciiz "\nPlayer's Cards: "
+	text_playerCardsScore:	.asciiz "\nPlayer's Score: "
+	text_playerWins:	.asciiz "\n**** Player Has Won!!! ****\n"
+	
+	text_hideCard:		.asciiz " *"
+	text_hideScore:		.asciiz "**"
+	text_space:		.asciiz " "
+	text_newLine:		.asciiz "\n"
+	
+	text_bust:		.asciiz "\nBust, You've Exceeded 21 points\n"
+	text_tie:		.asciiz "\nDraw, Both the Player and Dealer are tied.\n"
+	
+.text
+.globl main
+
+main:
+	la $a0, text_BlackJack
+	li $v0, 4
+	syscall					# Print text_BlackJack
+	
+	li $a0, 1				# Initialize card draw count to 1 for the dealer's first draw
+	li $t6, 0				# Dealer's card counter
+	
+	function_dealerDrawsCards:
+		addi $a0, $a0, 1		# In the first iteration, a0 is two, in subsequent ones it will be 1
+		la $a1, array_dealerCards	
+		mul $t7, $t6, 4			# t7 stores the number of cards times the length of a word
+		add $a1, $a1, $t7		# Update memory address for the next card
+	
+		jal function_generateCards	# Generate and store the cards
+		add $t6, $t6, $v0		# Update Dealer's card counter
+		move $a1, $t6			# Pass card counter to function_printCards
+	
+		la $a0, text_dealerCards
+		li $v0, 4
+		syscall				# Print text_dealerCards
+			la $a0, array_dealerCards
+			addi $a0, $a0, 0
+			lw $a0, 0($a0)
+			li $v0, 1
+			syscall			# Print 2nd position of array_dealerCards
+			la $a0, text_hideCard
+			li $v0, 4
+			syscall			# Print text_hideCard
+			
+		la $a0, array_dealerCards
+		move $a1, $t6			# Pass card counter to function_calculateValue
+		jal function_calculateValue	# Calculate Dealer's score
+		move $a3, $v0			# Store Dealer's total score in a3
+	
+		la $a0, text_dealerCardsScore
+		li $v0, 4
+		syscall				# Print text_dealerCardsScore
+			la $a0, text_hideScore		
+			li $v0, 4
+			syscall			# Prints text_hideScore
+		
+		move $t5, $a3			# Store Dealer's score in t5 for comparison
+		move $t4, $v0
+		
+		beq $t4, 1, function_playerBegins	# Jump to player's turn if choice is 1 (Hit)
+		beq $t4, 2, function_playerBegins	# Jump to player's turn if choice is 2 (Stay)
+		
+	function_playerBegins:			# Player's turn begins
+		li $a0, 1
+		li $t6, 0			# Player's card counter
+	
+	function_playerDrawCards_loop:
+		addi $a0, $a0, 1		
+		la $a1, array_playerCards	
+		mul $t7, $t6, 4			# Calculate the memory offset for the next card
+		add $a1, $a1, $t7		# Update memory address for the next card
+		la $a2, text_space
+	
+		jal function_generateCards	# Generate and store the cards
+	
+		add $t6, $t6, $v0		# Update player's card counter
+		move $a1, $t6			# Pass card counter to function_printCards
+	
+		la $a0, text_playerCards
+		li $v0, 4
+		syscall				# Print text_playerCards
+			la $a0 text_space
+			la $a2 array_playerCards
+			jal function_printCards	# Print Player's cards
+	
+		la $a0, array_playerCards
+		move $a1, $t6			# Pass card counter to function_calculateValue
+		jal function_calculateValue	# Calculate Player's score
+	
+		move $a3, $v0			# Store Player's score in a3
+	
+		la $a0, text_playerCardsScore
+		li $v0, 4
+		syscall				# Print text_playerCardsScore
+			move $a0, $a3
+			li $v0, 1
+			syscall 		# Print Player's score
+	
+		bgt $a3, 21, function_bust	# Jump to bust if player's score exceeds 21
+	
+		la $a0, text_choices
+			jal function_getPlayerChoice	# Get player's choice (Hit or Stay)
+	
+		move $t4, $v0
+		li $a0, 0
+		
+		beq $t4, 1, function_playerDrawCards_loop	# Loop if player chooses to Hit
+		beq $t4, 2, function_endGame			# End game if player chooses to Stay
+
+function_endGame:
+	la $a0, text_newLine
+	li $v0, 4
+	syscall			# Print text_newLine
+
+	la $a0, text_BlackJack
+	li $v0, 4
+	syscall			# Print text_BlackJack
+		
+	la $a0, text_dealerCards
+	li $v0, 4
+	syscall			# Print text_dealerCards
+		la $a0 text_space
+		la $a2 array_dealerCards
+		jal function_printCards	# Print Dealer's cards
+		
+	la $a0, text_dealerCardsScore
+	li $v0, 4
+	syscall			# Print text_dealerCardsScore
+		move $a0, $t5			
+		li $v0, 1
+		syscall		# Prints Dealer's score in t5
+		
+	la $a0, text_playerCards
+	li $v0, 4
+	syscall			# Print text_playerCards
+		la $a0 text_space
+		la $a2 array_playerCards
+		jal function_printCards	# Print Player's cards
+
+	la $a0, text_playerCardsScore
+	li $v0, 4
+	syscall			# Print text_playerCardsScore
+		move $a0, $a3
+		li $v0, 1
+		syscall 	# Print Player's score
+		
+	#Compares Dealer's & Player's total scores: t5 is Dealer and a3 is Player
+	bgt $t5, $a3, function_dealerWins
+	blt $t5, $a3, function_playerWins
+	beq $t5, $a3, function_tie
+		
+	function_bust:
+		la $a0, text_newLine
+		li $v0, 4
+		syscall			# Print text_newLine
+
+		la $a0, text_BlackJack
+		li $v0, 4
+		syscall			# Print text_BlackJack
+		
+		la $a0, text_dealerCards
+		li $v0, 4
+		syscall			# Print text_dealerCards
+			la $a0 text_space
+			la $a2 array_dealerCards
+			jal function_printCards	# Print Dealer's cards
+		
+		la $a0, text_dealerCardsScore
+		li $v0, 4
+		syscall			# Print text_dealerCardsScore
+			move $a0, $t5			
+			li $v0, 1
+			syscall		# Prints Dealer's score in t5
+		
+		la $a0, text_playerCards
+		li $v0, 4
+		syscall			# Print text_playerCards
+			la $a0 text_space
+			la $a2 array_playerCards
+			jal function_printCards	# Print Player's cards
+
+		la $a0, text_playerCardsScore
+		li $v0, 4
+		syscall			# Print text_playerCardsScore
+			move $a0, $a3
+			li $v0, 1
+			syscall 	# Print Player's score
+		
+		la $a0, text_bust
+		li $v0, 4
+		syscall			# Print text_bust
+		
+		la $a0, text_dealerWins
+		li $v0, 4
+		syscall			# Print text_dealerWins
+		li $v0, 10
+		syscall			# Exit program
+
+	function_dealerWins:	
+		la $a0, text_dealerWins
+		li $v0, 4
+		syscall			# Print text_dealerWins
+		li $v0, 10
+		syscall			# Exit program
+	
+	function_playerWins:	
+		la $a0, text_playerWins
+		li $v0, 4
+		syscall			# Print text_playerWins
+		li $v0, 10
+		syscall			# Exit program
+
+	function_tie:
+		la $a0, text_tie
+		li $v0, 4
+		syscall			# Print text_tie
+		li $v0, 10
+		syscall			# Exit program
+
+function_generateCards:
+	move $t0, $a0		# a0 is the size of the array, i.e., the number of cards to generate
+	move $t1, $a1		# a1 is the memory address of the array
+	li $t3, 0		# Generate card counter
+	
+	function_generateCards_loop:
+		beq $t3, $t0, function_generateCards_end	# When the loop repeats the number of times for the cards to generate 
+		li $a1, 10		# Initialize the maximum limit. It means the random number is between 0 and 9
+		li $v0, 42
+		syscall
+	
+		addi $a0, $a0, 1 	# Generate a random number between 1 and 11
+		sw $a0, ($t1)		# Store the generated card in the array
+	
+		addi $t1, $t1, 4	# Move to the next position in the array
+		addi $t3, $t3, 1	# Increment the card counter
+	
+		j function_generateCards_loop
+	
+	function_generateCards_end:
+		move $v0, $t3
+		jr $ra
+	
+function_printCards:
+	# a0 is the string to print a text_space
+	# a1 is the size of the array
+	# a2 is the memory address of the player's card array to be printed
+	li $t2, 1 			#Initialize counter
+	
+	function_printCards_loop:
+		move $t0, $a0
+		lw $t1, ($a2)		# Load the card value from memory
+	
+		move $a0, $t1
+		li $v0, 1
+		syscall			# Print the card value
+		
+		beq $a1, $t2, function_printCards_end	# Check if all cards are printed
+		
+		move $a0, $t0
+		li $v0, 4
+		syscall			# Print a space between cards
+		
+		addi $t2, $t2, 1	# Increment the counter
+		addi $a2, $a2, 4	# Move to the next card in the array
+		 
+		j function_printCards_loop
+		 
+	function_printCards_end:
+		jr $ra
+
+function_calculateValue:
+	# a0 is the array containing the player's cards
+	# a1 is the size of the array
+	li $t0, 0			# Loop counter
+ 	li $t2, 0			# Total value of cards
+ 	
+	function_calculateValue_loop:
+ 		lw $a2, ($a0)					# Load the card value from the array
+ 		beq $t0, $a1, function_calculateValue_end	# Exit loop if all cards are processed
+ 		beq $a2, 1, function_sumAce			# Special handling for Ace (value 1)
+ 		addi $a0, $a0, 4				# Move to the next card in the array
+ 		add $t2, $a2, $t2				# Add card value to total
+ 		add $t0, $t0, 1					# Increment loop counter
+ 		j function_calculateValue_loop
+ 		
+ 		function_sumAce:
+ 			addi $t2, $t2, 11			# Initially consider Ace as 11
+ 			bgt $t2, 21, function_subtractTen	# If total exceeds 21, consider Ace as 1
+ 			addi $a0, $a0, 4			# Move to the next card
+ 			add $t0, $t0, 1				# Increment loop counter
+ 			j function_calculateValue_loop
+ 			
+ 		function_subtractTen:
+ 			sub $t2, $t2, 10			# Subtract 10 to consider Ace as 1
+ 			addi $a0, $a0, 4			# Move to the next card
+ 			add $t0, $t0, 1				# Increment loop counter
+ 			j function_calculateValue_loop
+ 	
+ 	function_calculateValue_end:
+ 		move $v0, $t2					# Store the total value in v0
+ 		jr $ra
+
+function_getPlayerChoice:
+	# a1 is the address of the string asking the player to choose to hit or stand.
+	function_getPlayerChoice_loop:
+		li $v0, 4		# Print the choice string
+		syscall
+	
+		li $v0, 5		# Read integer input from the player
+		syscall
+	
+		# Ask for input again if it's different from 1 or 2
+		beq $v0, 1, function_getPlayerChoice_end
+		beq $v0, 2, function_getPlayerChoice_end
+		bne $v0, 1, function_getPlayerChoice_loop
+
+	function_getPlayerChoice_end:
+		jr $ra
