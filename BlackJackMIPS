@@ -68,10 +68,6 @@ main:
 			syscall			# Prints text_hideScore
 		
 		move $t5, $a3			# Store Dealer's score in t5 for comparison
-		move $t4, $v0
-		
-		beq $t4, 1, function_playerBegins	# Jump to player's turn if choice is 1 (Hit)
-		beq $t4, 2, function_playerBegins	# Jump to player's turn if choice is 2 (Stay)
 		
 	function_playerBegins:			# Player's turn begins
 		li $a0, 1
