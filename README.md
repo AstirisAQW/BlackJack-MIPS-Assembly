@@ -4,7 +4,7 @@ CS222 - Computer Architecture and Organization
 University of Science & Technology of Southern Philippines
 
 # Project Description
-This program is a MIPS assembly language simulation of a simplified version of the Blackjack card game. It allows a single player to play against a computer-controlled dealer.
+Developed a simplified, single-player Blackjack game against a computer-controlled dealer using MIPS assembly language, demonstrating low-level programming and computer architecture concepts.
 
 The core gameplay and features include:
 
@@ -54,5 +54,4 @@ The purpose of this project is to demonstrate understanding of MIPS assembly pro
 
 # Credits
 AstirisAQW - https://github.com/AstirisAQW
-
 HarV1821 - https://github.com/HarV1821
