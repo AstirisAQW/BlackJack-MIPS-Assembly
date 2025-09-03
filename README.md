@@ -52,7 +52,7 @@ The purpose of this project is to demonstrate understanding of MIPS assembly pro
 2.  Run the assembled code.
 3.  Follow the on-screen prompts to play the game.
 
-# Credits
+# Authors
 AstirisAQW - https://github.com/AstirisAQW
 
 HarV1821 - https://github.com/HarV1821
