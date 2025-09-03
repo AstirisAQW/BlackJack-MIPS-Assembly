@@ -9,7 +9,7 @@ Developed a simplified, single-player Blackjack game against a computer-controll
 The core gameplay and features include:
 
 1.  **Initial Deal:**
-    *   The dealer receives two cards, with one card shown to the player and the other hidden (the "hole card").
+    *   The dealer receives two cards, with one card shown and one card hidden to the player.
     *   The player receives two cards, both face up.
 
 2.  **Card Generation:**
@@ -21,8 +21,8 @@ The core gameplay and features include:
     *   The dealer's score is initially partially hidden (only the value of the face-up card is implicitly known to the player, and the total score is displayed as "**").
 
 4.  **Player's Turn:**
-    *   The player is prompted to either "Hit" (draw another card) or "Stay" (keep their current hand).
-    *   If the player chooses to "Hit", another card is dealt, and their score is updated.
+    *   The player can either "Hit" (draw another card) or "Stay" (keep their current hand).
+    *   If the player chooses to "Hit", another card is dealt to the players hand, and their score is updated.
     *   If the player's score exceeds 21 (a "Bust"), the player automatically loses, and the game ends.
     *   The player can continue to "Hit" until they choose to "Stay" or "Bust".
 
@@ -40,7 +40,7 @@ The core gameplay and features include:
         *   If the dealer busted (and the player did not), the player wins.
         *   If neither busted, their scores are compared:
             *   The hand closest to 21 without exceeding it wins.
-            *   If both have the same score, the game is a "Tie" (or "Push").
+            *   If both have the same score, the game is a "Tie".
 
 7.  **User Input:**
     *   The program uses MIPS system call `li $v0, 5` followed by `syscall` to read an integer from the user (1 for "Hit", 2 for "Stay").
@@ -54,4 +54,5 @@ The purpose of this project is to demonstrate understanding of MIPS assembly pro
 
 # Credits
 AstirisAQW - https://github.com/AstirisAQW
+
 HarV1821 - https://github.com/HarV1821
