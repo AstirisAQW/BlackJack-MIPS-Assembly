@@ -1,26 +1,26 @@
 .data
 .align 2
-	array_dealerCards:	.space 40	# Space to store dealer's cards
-	array_playerCards:	.space 40	# Space to store player's cards
+	array_dealerCards:		.space 40	# Space to store dealer's cards
+	array_playerCards:		.space 40	# Space to store player's cards
 	
-	text_BlackJack: 	.asciiz "\n**** BlackJack in MIPS ****"
-	text_choices:		.asciiz "\nPress Hit(1) or Stay(2): "
+	text_BlackJack: 		.asciiz "\n**** BlackJack in MIPS ****"
+	text_choices:			.asciiz "\nPress Hit(1) or Stay(2): "
 	
-	text_dealerCards:	.asciiz "\nDealer's Cards: "
+	text_dealerCards:		.asciiz "\nDealer's Cards: "
 	text_dealerCardsScore:	.asciiz "\nDealer's Score: "
-	text_dealerWins:	.asciiz "\n**** Dealer has won!!! ****\n"
+	text_dealerWins:		.asciiz "\n**** Dealer has won!!! ****\n"
 	
-	text_playerCards:	.asciiz "\nPlayer's Cards: "
+	text_playerCards:		.asciiz "\nPlayer's Cards: "
 	text_playerCardsScore:	.asciiz "\nPlayer's Score: "
-	text_playerWins:	.asciiz "\n**** Player Has Won!!! ****\n"
+	text_playerWins:		.asciiz "\n**** Player Has Won!!! ****\n"
 	
-	text_hideCard:		.asciiz " *"
-	text_hideScore:		.asciiz "**"
-	text_space:		    .asciiz " "
-	text_newLine:		.asciiz "\n"
+	text_hideCard:			.asciiz " *"
+	text_hideScore:			.asciiz "**"
+	text_space:		  	  	.asciiz " "
+	text_newLine:			.asciiz "\n"
 	
-	text_bust:		    .asciiz "\nBust, You've Exceeded 21 points\n"
-	text_tie:		    .asciiz "\nDraw, Both the Player and Dealer are tied.\n"
+	text_bust:		  	  	.asciiz "\nBust, You've Exceeded 21 points\n"
+	text_tie:		   		.asciiz "\nDraw, Both the Player and Dealer are tied.\n"
 	
 .text
 .globl main
@@ -31,8 +31,6 @@ main:
 	syscall					# Print text_BlackJack
 	
 	# Initialize game state registers
-	# $s0: dealer_card_count, $s1: player_card_count
-	# $s2: dealer_score, $s3: player_score
 	li $s0, 0				# Dealer's card counter
 	li $s1, 0				# Player's card counter
 	li $s2, 0				# Dealer's score
